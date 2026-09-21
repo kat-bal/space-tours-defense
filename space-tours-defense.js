@@ -323,6 +323,7 @@
     '  -webkit-user-select:none;user-select:none;-webkit-touch-callout:none;',
     '  touch-action:pan-y;}',
     '.root[data-playing="1"]{touch-action:none;}',
+    '.root[data-playing="1"][data-fills="1"]{touch-action:pan-y;}',
     '.root:focus-visible{outline:2px solid var(--c-gold);outline-offset:2px;}',
     'canvas{display:block;width:100%;height:100%;image-rendering:pixelated;}',
     '.overlay{position:absolute;inset:0;z-index:1;display:flex;align-items:center;justify-content:center;',
@@ -475,6 +476,19 @@
     this.raf = requestAnimationFrame(this.loop);
   }
 
+  // Pinch zoom can leave the widget covering the entire visible screen, at
+  // which point there is nowhere else to put a finger and touch-action:none
+  // would trap the reader on the page. visualViewport reports what is actually
+  // visible, so the game can give the vertical swipe back when that happens.
+  Game.prototype.updateGestureMode = function () {
+    var vv = global.visualViewport;
+    var vw = vv ? vv.width : (global.innerWidth || 0);
+    var vh = vv ? vv.height : (global.innerHeight || 0);
+    var r = this.root.getBoundingClientRect();
+    var fills = vw > 0 && vh > 0 && r.width >= vw - 4 && r.height >= vh - 4;
+    this.root.dataset.fills = fills ? '1' : '0';
+  };
+
   Game.prototype.readPalette = function () {
     var cs = getComputedStyle(this.root);
     function v(name, fallback) {
@@ -546,6 +560,7 @@
     this.maxCols = clamp(Math.floor((w - 2 * this.margin) / this.cellW) - 1, 5, 11);
     this.sprites.clear();
     this.makeStars();
+    this.updateGestureMode();
     this.layoutWave(false);
   };
 
@@ -685,6 +700,7 @@
     this.overlay.hidden = playing;
     this.overlay.dataset.mode = state;
     this.root.dataset.playing = playing ? '1' : '0';
+    this.updateGestureMode();
     this.elPause.hidden = !playing;
     this.elPause.textContent = 'Pause';
     if (state === 'attract') this.sound.enabled = false;
@@ -788,6 +804,14 @@
     this.onBlur = function () { if (self.state === 'playing') self.setState('paused'); };
     global.addEventListener('blur', this.onBlur);
 
+    // Pinch zoom fires neither resize nor the ResizeObserver, so the gesture
+    // mode has to follow the visual viewport directly.
+    this.onViewport = function () { self.updateGestureMode(); };
+    if (global.visualViewport) {
+      global.visualViewport.addEventListener('resize', this.onViewport);
+      global.visualViewport.addEventListener('scroll', this.onViewport);
+    }
+
     this.root.addEventListener('keydown', function (e) {
       var k = e.key;
       if (k === ' ' || k === 'Spacebar' || k === 'ArrowLeft' || k === 'ArrowRight' ||
@@ -862,6 +886,10 @@
     if (this.ro) this.ro.disconnect();
     if (this.io) this.io.disconnect();
     if (this.onWinResize) global.removeEventListener('resize', this.onWinResize);
+    if (global.visualViewport && this.onViewport) {
+      global.visualViewport.removeEventListener('resize', this.onViewport);
+      global.visualViewport.removeEventListener('scroll', this.onViewport);
+    }
     global.removeEventListener('blur', this.onBlur);
   };
 
