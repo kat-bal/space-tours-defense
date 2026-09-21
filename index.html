@@ -1,0 +1,125 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Space Tours Defense</title>
+<meta name="description" content="A dependency-free arcade widget you can drop on any page with one line. Escort the tour liner to Saturn." />
+<meta name="color-scheme" content="dark" />
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3E%3Crect width='16' height='16' fill='%230a0f1c'/%3E%3Cpath fill='%23f7b955' d='M7 3h2v2H7zM5 5h6v2H5zM3 7h10v3H3zM3 10h2v2H3zM11 10h2v2h-2zM6 11h4v1H6z'/%3E%3C/svg%3E" />
+<style>
+  :root{
+    --bg:#0a0f1c; --surface:#121a2c; --line:#263252;
+    --text:#eef1f7; --text-muted-solid:#96a3c2;
+    --gold:#f7b955; --ember:#f0812e; --pulse:#7ec8ff; --pulse-dim:#5a86ad;
+    --danger:#ff6b6b; --ok:#5fd68a;
+  }
+  *{box-sizing:border-box;}
+  html{color-scheme:dark;}
+  body{
+    margin:0;padding:0 20px;background:var(--bg);color:var(--text);
+    font:16px/1.6 system-ui,-apple-system,"Segoe UI",sans-serif;
+  }
+  .wrap{max-width:860px;margin:0 auto;padding:56px 0 80px;}
+  header{margin-bottom:28px;}
+  .eyebrow{font-size:11px;letter-spacing:.18em;text-transform:uppercase;color:var(--gold);
+    font-weight:700;margin:0 0 10px;}
+  h1{font-size:clamp(30px,6vw,48px);line-height:1.05;margin:0 0 12px;font-weight:800;
+    letter-spacing:-.02em;}
+  .lede{font-size:18px;color:var(--text-muted-solid);margin:0;max-width:60ch;}
+  #game{margin:32px 0 8px;}
+  .under{display:flex;flex-wrap:wrap;gap:8px 18px;font-size:13px;
+    color:var(--text-muted-solid);margin:0 0 48px;}
+  kbd{font:inherit;font-size:12px;background:var(--line);border-radius:4px;padding:1px 6px;}
+  h2{font-size:22px;margin:40px 0 10px;font-weight:800;letter-spacing:-.01em;}
+  p{max-width:68ch;}
+  pre{background:var(--surface);border:1px solid var(--line);border-radius:10px;
+    padding:16px;overflow-x:auto;font-size:13px;line-height:1.6;}
+  code{font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;}
+  p code{background:var(--surface);border:1px solid var(--line);border-radius:4px;padding:1px 5px;
+    font-size:13px;}
+  table{width:100%;border-collapse:collapse;font-size:14px;margin:12px 0;display:block;
+    overflow-x:auto;}
+  th,td{text-align:left;padding:9px 12px;border-bottom:1px solid var(--line);vertical-align:top;}
+  th{font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:var(--text-muted-solid);}
+  a{color:var(--gold);}
+  footer{margin-top:64px;padding-top:24px;border-top:1px solid var(--line);
+    font-size:13px;color:var(--text-muted-solid);}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <header>
+    <p class="eyebrow">Arcade widget</p>
+    <h1>Space Tours Defense</h1>
+    <p class="lede">Raiders between here and Saturn, and a liner full of tourists behind you.
+      One JavaScript file, no dependencies, drops onto any page in one line.</p>
+  </header>
+
+  <div id="game"
+       data-space-tours-game
+       data-credit-label="Calvera Solutions"
+       data-credit-href="https://calverasolutions.eu"></div>
+
+  <p class="under">
+    <span><kbd>&larr;</kbd> <kbd>&rarr;</kbd> move</span>
+    <span><kbd>Space</kbd> fire</span>
+    <span><kbd>P</kbd> pause</span>
+    <span><kbd>M</kbd> sound</span>
+    <span>On a phone: drag to steer, hold to fire.</span>
+  </p>
+
+  <h2>Putting it on a page</h2>
+  <p>Copy the file next to your HTML, then add the container and the script. It mounts itself.</p>
+<pre><code>&lt;div data-space-tours-game&gt;&lt;/div&gt;
+&lt;script src="space-tours-defense.js"&gt;&lt;/script&gt;</code></pre>
+
+  <p>The widget fills the width of its container and takes a 4:3 box by default. Give the
+    container a height of your own and it uses that instead.</p>
+
+  <h2>Options</h2>
+  <p>Set them as data attributes on the container, or pass an object to
+    <code>SpaceToursDefense.mount(el, options)</code>.</p>
+  <table>
+    <thead><tr><th>Attribute</th><th>Default</th><th>What it does</th></tr></thead>
+    <tbody>
+      <tr><td><code>data-attract</code></td><td><code>true</code></td>
+        <td>Plays itself, arcade cabinet style, until someone takes the controls. Set to
+          <code>false</code> for a still title screen.</td></tr>
+      <tr><td><code>data-sound</code></td><td><code>false</code></td>
+        <td>Sound is off until the player asks for it. The demo run is always silent.</td></tr>
+      <tr><td><code>data-lives</code></td><td><code>3</code></td><td>Escort ships you start with.</td></tr>
+      <tr><td><code>data-aspect</code></td><td><code>4 / 3</code></td>
+        <td>Box shape, used only when the container has no height of its own.</td></tr>
+      <tr><td><code>data-title</code></td><td>Space Tours Defense</td><td>Heading on the title screen.</td></tr>
+      <tr><td><code>data-credit-label</code><br><code>data-credit-href</code></td><td>none</td>
+        <td>Optional credit line under the start button.</td></tr>
+    </tbody>
+  </table>
+
+  <h2>It borrows your colors</h2>
+  <p>The game runs inside a shadow root, so nothing leaks either way: the host page cannot
+    restyle it by accident and its own CSS cannot touch the page. What it does read are the
+    custom properties <code>--bg</code>, <code>--line</code>, <code>--text</code>,
+    <code>--gold</code>, <code>--ember</code>, <code>--pulse</code>, <code>--pulse-dim</code>,
+    <code>--danger</code> and <code>--ok</code>, if the page defines them. Otherwise it falls
+    back to the palette you see here.</p>
+
+  <h2>Behaviour worth knowing</h2>
+  <p>It pauses when it scrolls out of view and when the tab loses focus, so a widget sitting
+    halfway down a page is not quietly burning a laptop battery. It honours
+    <code>prefers-reduced-motion</code>. Keyboard input is only captured while the widget has
+    focus, so arrow keys still scroll the page everywhere else. The high score is kept in
+    <code>localStorage</code> on the visitor's own machine and goes nowhere near a server.</p>
+
+  <footer>
+    MIT licensed. Source on <a href="https://github.com/kat-bal/space-tours-defense">GitHub</a>.
+    Built as a companion to <a href="https://calverasolutions.eu/lab.html">Space Tours</a>, the
+    API testing sandbox, by <a href="https://calverasolutions.eu">Calvera Solutions</a>.
+  </footer>
+
+</div>
+<script src="space-tours-defense.js"></script>
+</body>
+</html>
