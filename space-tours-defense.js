@@ -527,10 +527,9 @@
     this.hudH = this.margin + this.hudSize * 1.5 +
       SPRITES.escort.length * this.hudIconPx + 8 +
       (w < 560 ? this.hudSize + 5 : 0);
-    this.cellW = 16 * px;
-    this.cellH = 13 * px;
-    this.cols = clamp(Math.floor((w - 2 * this.margin) / this.cellW) - 1, 5, 11);
     this.rowCount = 5;
+    // The furniture along the bottom is placed first, because whatever is left
+    // over is the room the formation has to fit into.
     // The liner is drawn much larger than the rest of the art and sits half
     // off the bottom edge, so only its upper decks are on screen.
     this.linerPx = clamp(Math.round(w / 40), px, px * 8);
@@ -538,9 +537,16 @@
     this.linerY = h - this.linerH;
     this.playerY = this.linerY - 4 * px;   // baseline the escort flies along
     this.podY = this.playerY - 24 * px;
+
+    // Row pitch tightens in a short widget rather than letting five rows of
+    // raiders overrun the escort lane, which would read as an instant loss.
+    var room = this.playerY - 6 * px - Math.max(this.hudH, h * 0.09);
+    this.cellH = clamp(Math.floor(room / (this.rowCount + 1)), 6, 13 * px);
+    this.cellW = 16 * px;
+    this.maxCols = clamp(Math.floor((w - 2 * this.margin) / this.cellW) - 1, 5, 11);
     this.sprites.clear();
     this.makeStars();
-    this.layoutWave(true);
+    this.layoutWave(false);
   };
 
   Game.prototype.makeStars = function () {
@@ -582,13 +588,17 @@
     this.layoutWave(true);
   };
 
-  // rebuild=true starts the wave over; on a resize it is called again so the
-  // formation and the cargo pods land on the new pixel grid.
+  // rebuild=true starts a wave from scratch. Every other call is a resize, and
+  // a resize must never change the state of play: raiders stay dead, cargo pods
+  // stay holed, and the formation keeps the ground it has made. Only geometry
+  // is recomputed. This matters most on phones, where the address bar sliding
+  // away mid-game is an ordinary resize.
   Game.prototype.layoutWave = function (rebuild) {
     if (this.wave == null) return;
-    var px = this.px;
+    var px = this.px, i;
 
     if (rebuild || !this.raiders) {
+      this.cols = this.maxCols;
       this.raiders = [];
       for (var row = 0; row < this.rowCount; row++) {
         var type = row === 0 ? 'raiderA' : (row < 3 ? 'raiderB' : 'raiderC');
@@ -597,15 +607,25 @@
           this.raiders.push({ row: row, col: col, type: type, value: value, alive: true });
         }
       }
-    } else {
-      // Keep the kills, drop any raider whose column no longer exists.
-      this.raiders = this.raiders.filter(function (r) { return r.col < this.cols; }, this);
     }
 
+    // Squeeze the wave's own column count into whatever width there is now.
+    // Dropping columns instead would delete the raiders standing in them.
+    this.cellW = Math.min(16 * px, Math.floor((this.w - 2 * this.margin) / (this.cols + 0.5)));
     var formationW = this.cols * this.cellW;
-    this.fx = Math.round((this.w - formationW) / 2);
-    this.fy = Math.round(Math.max(this.hudH, this.h * 0.09) +
-      Math.min(this.wave - 1, 5) * this.cellH * 0.35);
+    var topLimit = Math.max(this.hudH, this.h * 0.09);
+
+    if (rebuild) {
+      this.fx = Math.round((this.w - formationW) / 2);
+      this.fy = Math.round(topLimit + Math.min(this.wave - 1, 5) * this.cellH * 0.35);
+    } else {
+      this.fx = clamp(this.fx, this.margin, this.w - this.margin - formationW);
+      // Leave the whole formation clear of the escort lane. Without this, a
+      // widget that suddenly gets shorter drops the raiders straight onto the
+      // liner and ends the run on a resize the player did not ask for.
+      var bottomLimit = this.playerY - 4 * px - this.rowCount * this.cellH;
+      this.fy = clamp(this.fy, topLimit, Math.max(topLimit, bottomLimit));
+    }
     this.dropDist = Math.round(this.cellH * 0.34);
 
     this.player = {
@@ -613,21 +633,31 @@
       w: SPRITES.escort[0].length * px,
       h: SPRITES.escort.length * px,
       speed: 105 * px,
-      cooldown: 0,
-      dead: 0
+      cooldown: this.player ? this.player.cooldown : 0,
+      dead: this.player ? this.player.dead : 0
     };
 
-    this.pods = [];
-    var podW = SPRITES.pod[0].length * px;
-    var podCount = this.w < 420 ? 3 : 4;
-    var gap = (this.w - 2 * this.margin - podCount * podW) / (podCount - 1);
-    for (var i = 0; i < podCount; i++) {
-      this.pods.push(new Pod(
-        Math.round(this.margin + i * (podW + gap)),
-        this.podY,
-        px,
-        this.palette.pulseDim
-      ));
+    if (rebuild || !this.pods || !this.pods.length) {
+      this.pods = [];
+      var podW = SPRITES.pod[0].length * px;
+      var podCount = this.w < 420 ? 3 : 4;
+      var gap = (this.w - 2 * this.margin - podCount * podW) / (podCount - 1);
+      for (i = 0; i < podCount; i++) {
+        this.pods.push(new Pod(
+          Math.round(this.margin + i * (podW + gap)),
+          this.podY,
+          px,
+          this.palette.pulseDim
+        ));
+      }
+    } else {
+      // Move the existing pods, damage and all, rather than casting new ones.
+      var w0 = this.pods[0].w;
+      var gap0 = (this.w - 2 * this.margin - this.pods.length * w0) / (this.pods.length - 1);
+      for (i = 0; i < this.pods.length; i++) {
+        this.pods[i].x = Math.round(this.margin + i * (w0 + gap0));
+        this.pods[i].y = this.podY;
+      }
     }
   };
 
