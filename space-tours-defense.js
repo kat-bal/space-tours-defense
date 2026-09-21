@@ -660,7 +660,7 @@
 
   Game.prototype.updateOverlay = function () {
     var s = this.state;
-    var hi = this.highScore ? ' &middot; best ' + this.highScore : '';
+    var hi = this.highScore ? ' \u00b7 best ' + this.highScore : '';
     if (s === 'attract') {
       this.elEyebrow.textContent = 'Demo running';
       this.elTitle.textContent = this.opts.title;
@@ -676,7 +676,7 @@
     } else if (s === 'paused') {
       this.elEyebrow.textContent = 'Holding position';
       this.elTitle.textContent = 'Paused';
-      this.elLede.textContent = 'Wave ' + this.wave + ' &middot; ' + this.score + ' points';
+      this.elLede.textContent = 'Wave ' + this.wave + ' \u00b7 ' + this.score + ' points';
       this.elStart.textContent = 'Resume';
       this.elHint.innerHTML = '<kbd>P</kbd> also resumes';
     } else if (s === 'over') {
