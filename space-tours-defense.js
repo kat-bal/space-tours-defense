@@ -319,8 +319,10 @@
     '  background:var(--c-bg);color:var(--c-text);',
     '  border:1px solid var(--c-line);border-radius:14px;overflow:hidden;',
     '  font-family:inherit;line-height:1.45;',
-    '  -webkit-tap-highlight-color:transparent;touch-action:none;',
-    '}',
+    '  -webkit-tap-highlight-color:transparent;',
+    '  -webkit-user-select:none;user-select:none;-webkit-touch-callout:none;',
+    '  touch-action:pan-y;}',
+    '.root[data-playing="1"]{touch-action:none;}',
     '.root:focus-visible{outline:2px solid var(--c-gold);outline-offset:2px;}',
     'canvas{display:block;width:100%;height:100%;image-rendering:pixelated;}',
     '.overlay{position:absolute;inset:0;z-index:1;display:flex;align-items:center;justify-content:center;',
@@ -652,6 +654,7 @@
     var playing = state === 'playing';
     this.overlay.hidden = playing;
     this.overlay.dataset.mode = state;
+    this.root.dataset.playing = playing ? '1' : '0';
     this.elPause.hidden = !playing;
     this.elPause.textContent = 'Pause';
     if (state === 'attract') this.sound.enabled = false;
@@ -784,6 +787,8 @@
     var dragging = false;
     this.canvas.addEventListener('pointerdown', function (e) {
       if (self.state !== 'playing') { self.startPlaying(); return; }
+      // Stops the long-press turning into a selection or a callout mid-game.
+      e.preventDefault();
       dragging = true;
       self.canvas.setPointerCapture(e.pointerId);
       self.touch.aimX = e.offsetX;
