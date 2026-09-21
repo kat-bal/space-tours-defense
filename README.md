@@ -1,8 +1,8 @@
 # Space Tours Defense
 
 A small arcade game that drops onto any web page with one line of HTML. Raiders
-between here and Saturn, a liner full of tourists behind you, and nothing else
-in the way.
+between Earth orbit and Neptune, a liner full of tourists behind you, and
+nothing else in the way.
 
 **Play it:** [kat-bal.github.io/space-tours-defense](https://kat-bal.github.io/space-tours-defense/)
 
@@ -82,8 +82,9 @@ Five rows of raiders step across the screen and drop a row at each wall, faster
 as their numbers thin out, which is the shape of the 1978 original. What is
 different: four destructible cargo pods rather than bunkers, a salvage barge
 crossing the top for bonus points, and a liner filling the bottom of the screen
-that ends the run if the raiders reach it. Waves are named after the Space Tours
-destinations, Mercury through Neptune, and then keep going. An extra escort ship
+that ends the run if the raiders reach it. Waves follow the liner's route outwards: Earth
+orbit, then the Space Tours destinations in order of distance from the sun,
+Mercury through Neptune, and then round again. An extra escort ship
 every 3000 points.
 
 ## Development

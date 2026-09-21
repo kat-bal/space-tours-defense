@@ -1,6 +1,6 @@
 /*!
  * Space Tours Defense v1.0.0
- * An embeddable, dependency-free arcade widget: escort the tour liner to Saturn.
+ * An embeddable, dependency-free arcade widget: escort the tour liner to Neptune.
  *
  * https://github.com/kat-bal/space-tours-defense
  * MIT License, (c) 2026 Calvera Solutions
@@ -132,9 +132,11 @@
     ]
   };
 
-  // Waves are named after the Space Tours destination list. After Neptune the
-  // run keeps going with progressively meaner numbers.
-  var DESTINATIONS = ['Mercury', 'Venus', 'Mars', 'Jupiter', 'Saturn', 'Uranus', 'Neptune'];
+  // The liner leaves Earth orbit and works outwards, so the waves are the
+  // Space Tours destination list in order of distance from the sun, with the
+  // departure in front of it. After Neptune the run loops with meaner numbers.
+  var DESTINATIONS = ['Earth orbit', 'Mercury', 'Venus', 'Mars', 'Jupiter',
+                      'Saturn', 'Uranus', 'Neptune'];
 
   /* ----------------------------------------------------------------------
      Small helpers
@@ -668,7 +670,7 @@
     } else if (s === 'title') {
       this.elEyebrow.textContent = 'Escort duty';
       this.elTitle.textContent = this.opts.title;
-      this.elLede.textContent = 'Raiders between here and Saturn. The liner behind you has passengers on it.';
+      this.elLede.textContent = 'Eight stops out to Neptune. The liner behind you has passengers on it.';
       this.elStart.textContent = 'Start escort';
       this.elHint.innerHTML = '<kbd>&larr;</kbd> <kbd>&rarr;</kbd> to move, <kbd>Space</kbd> to fire' + hi;
     } else if (s === 'paused') {
