@@ -315,7 +315,7 @@
     '  --c-pulse-dim:var(--pulse-dim,#5a86ad);',
     '  --c-danger:var(--danger,#ff6b6b);',
     '  --c-ok:var(--ok,#5fd68a);',
-    '  position:relative;display:block;width:100%;height:100%;container-type:inline-size;',
+    '  position:relative;display:block;width:100%;height:100%;container-type:size;',
     '  background:var(--c-bg);color:var(--c-text);',
     '  border:1px solid var(--c-line);border-radius:14px;overflow:hidden;',
     '  font-family:inherit;line-height:1.45;',
@@ -369,7 +369,21 @@
     '.touch .fire{color:var(--c-gold);border-color:var(--c-gold);flex:1;max-width:180px;}',
     '.sr{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);',
     '  clip-path:inset(50%);white-space:nowrap;}',
-    '@media (prefers-reduced-motion:reduce){.btn{transition:none;}}'
+    '@media (prefers-reduced-motion:reduce){.btn{transition:none;}}',
+    // A short widget cannot afford a full-size panel: it would cover the very
+    // thing the panel is inviting you to look at.
+    '@container (max-height:430px){',
+    '  .overlay{padding:12px;}',
+    '  .title{font-size:clamp(17px,4.4cqw,22px);}',
+    '  .lede{font-size:13px;margin-bottom:12px;}',
+    '  .btn{padding:9px 17px;font-size:13px;}',
+    '  .hint,.credit{margin-top:9px;}',
+    '  .overlay[data-mode="attract"] .panel{padding:14px 16px;}',
+    '}',
+    '@container (max-height:340px){',
+    '  .lede{display:none;}',
+    '  .credit{display:none;}',
+    '}'
   ].join('\n');
 
   var MARKUP = [
@@ -710,24 +724,28 @@
   Game.prototype.updateOverlay = function () {
     var s = this.state;
     var hi = this.highScore ? ' \u00b7 best ' + this.highScore : '';
+    var touchy = this.root.getAttribute('data-touch') === '1';
+    var controls = touchy
+      ? 'Drag to steer, hold to fire'
+      : '<kbd>&larr;</kbd> <kbd>&rarr;</kbd> to move, <kbd>Space</kbd> to fire';
     if (s === 'attract') {
       this.elEyebrow.textContent = 'Demo running';
       this.elTitle.textContent = this.opts.title;
       this.elLede.textContent = 'Escort the tour liner. Nothing gets past you.';
       this.elStart.textContent = 'Take the controls';
-      this.elHint.innerHTML = '<kbd>&larr;</kbd> <kbd>&rarr;</kbd> to move, <kbd>Space</kbd> to fire' + hi;
+      this.elHint.innerHTML = controls + hi;
     } else if (s === 'title') {
       this.elEyebrow.textContent = 'Escort duty';
       this.elTitle.textContent = this.opts.title;
       this.elLede.textContent = 'Eight stops out to Neptune. The liner behind you has passengers on it.';
       this.elStart.textContent = 'Start escort';
-      this.elHint.innerHTML = '<kbd>&larr;</kbd> <kbd>&rarr;</kbd> to move, <kbd>Space</kbd> to fire' + hi;
+      this.elHint.innerHTML = controls + hi;
     } else if (s === 'paused') {
       this.elEyebrow.textContent = 'Holding position';
       this.elTitle.textContent = 'Paused';
       this.elLede.textContent = 'Wave ' + this.wave + ' \u00b7 ' + this.score + ' points';
       this.elStart.textContent = 'Resume';
-      this.elHint.innerHTML = '<kbd>P</kbd> also resumes';
+      this.elHint.innerHTML = touchy ? '' : '<kbd>P</kbd> also resumes';
     } else if (s === 'over') {
       var reached = DESTINATIONS[(this.wave - 1) % DESTINATIONS.length];
       this.elEyebrow.textContent = 'Escort lost';
@@ -735,7 +753,7 @@
       this.elLede.innerHTML = 'You made it to ' + reached + ' on wave ' + this.wave +
         '.<br>Best run so far: ' + this.highScore + '.';
       this.elStart.textContent = 'Fly again';
-      this.elHint.innerHTML = '<kbd>Space</kbd> also restarts';
+      this.elHint.innerHTML = touchy ? '' : '<kbd>Space</kbd> also restarts';
     }
   };
 
