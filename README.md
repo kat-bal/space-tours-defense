@@ -83,7 +83,7 @@ as their numbers thin out, which is the shape of the 1978 original. What is
 different: four destructible cargo pods rather than bunkers, a salvage barge
 crossing the top for bonus points, and a liner filling the bottom of the screen
 that ends the run if the raiders reach it. Waves follow the liner's route outwards: Earth
-orbit, then the Space Tours destinations in order of distance from the sun,
+orbit, then the Space Tours destinations in order of distance from the Sun,
 Mercury through Neptune, and then round again. An extra escort ship
 every 3000 points.
 

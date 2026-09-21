@@ -133,7 +133,7 @@
   };
 
   // The liner leaves Earth orbit and works outwards, so the waves are the
-  // Space Tours destination list in order of distance from the sun, with the
+  // Space Tours destination list in order of distance from the Sun, with the
   // departure in front of it. After Neptune the run loops with meaner numbers.
   var DESTINATIONS = ['Earth orbit', 'Mercury', 'Venus', 'Mars', 'Jupiter',
                       'Saturn', 'Uranus', 'Neptune'];
